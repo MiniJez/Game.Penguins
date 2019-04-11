@@ -9,10 +9,11 @@ namespace Game.Penguins
 {
     class FakePlayer : IPlayer
     {
-        public FakePlayer(string playerName, PlayerType playerType)
+        public FakePlayer(string playerName, PlayerType playerType, PlayerColor color)
         {
             Name = playerName;
             PlayerType = playerType;
+			Color = color;
         }
 
         public FakePlayer()

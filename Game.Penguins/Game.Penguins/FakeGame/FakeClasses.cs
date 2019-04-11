@@ -8,11 +8,19 @@ namespace Game.Penguins
 {
     class FakeClasses : IGame
     {
+		private List<PlayerColor> availableColor;
         public FakeClasses()
         {
             Board = new FakeBoard();
             Players = new List<IPlayer>();
-        }
+
+			// init the list of available colors with all colors
+			availableColor = new List<PlayerColor>();
+			for (int i = 0; i < 4; i++)
+			{
+				availableColor.Add((PlayerColor)i);
+			}
+		}
 
         /// <summary>
         /// Current state of the board
@@ -47,9 +55,17 @@ namespace Game.Penguins
         /// <param name="playerType"></param>
         public IPlayer AddPlayer(string playerName, PlayerType playerType)
         {
-            IPlayer player = new FakePlayer(playerName, playerType);
-            Players.Add(player);
+			Random r = new Random();
+			//PlayerColor color = new PlayerColor();
 
+			Random random = new Random();	// new random
+			int number = random.Next(0, availableColor.Count-1);	// new random between 0 and the length of availableColor
+			PlayerColor tmpColor = new PlayerColor();	// new temp color
+			tmpColor = availableColor[number];	//	the temp color take ine value in the list
+			availableColor.RemoveAt(number);	//	the value is removed in the list
+			
+			IPlayer player = new FakePlayer(playerName, playerType, tmpColor);
+            Players.Add(player);
             return player;
         }
 
