@@ -89,8 +89,17 @@ namespace Game.Penguins
             Cell end = SearchCell(destination);
             List<List<Cell>> avalaibleDeplacement = FindAvalaibleDeplacement(start, end);
 
-            if (start.CurrentPenguin.Player == CurrentPlayer && end.CellType == CellType.Fish && IsInAvalaibleDeplacement(avalaibleDeplacement, destination))
+            if (start.CurrentPenguin != null && start.CurrentPenguin.Player == CurrentPlayer && end.CellType == CellType.Fish && IsInAvalaibleDeplacement(avalaibleDeplacement, destination))
             {
+                var path = GetPath((Cell)destination);
+                if (path != null)
+                {
+                    for (int i = 0; i < path.Count; i++)
+                    {
+                        Console.Write("i={0};j={1}   //     ", path[i].Y, path[i].X);
+                    }
+                }
+
                 PlayerClass currentPlayer = (PlayerClass)CurrentPlayer;
                 currentPlayer.Points += start.FishCount;
                 currentPlayer.ChangeState();
@@ -108,6 +117,136 @@ namespace Game.Penguins
                 start.ChangeState();
                 end.ChangeState();
             }
+        }
+
+        public List<Cell> FindEmptyCellNeighbor(Cell dest)
+        {
+            List<Cell> neighbor = new List<Cell>();
+            int[] originIndex = SearchIndexOfCell(dest);
+            int modifier = 0;
+
+            if (originIndex[1] % 2 == 0)
+            {
+                modifier = -1;
+            }
+            else
+            {
+                modifier = 1;
+            }
+
+            neighbor.Add((Cell)Board.Board[originIndex[0] + modifier, originIndex[1] - 1]);
+            neighbor.Add((Cell)Board.Board[originIndex[0], originIndex[1] - 1]);
+            neighbor.Add((Cell)Board.Board[originIndex[0] + modifier, originIndex[1] + 1]);
+            neighbor.Add((Cell)Board.Board[originIndex[0], originIndex[1] + 1]);
+            neighbor.Add((Cell)Board.Board[originIndex[0] - 1, originIndex[1]]);
+            neighbor.Add((Cell)Board.Board[originIndex[0] + 1, originIndex[1]]);
+
+            neighbor.RemoveAll(e => e.CellType != CellType.Water);
+
+            return neighbor;
+        }
+
+        public List<LocationPathFinding> GetPath(Cell dest)
+        {
+            List<Cell> neighbor = FindEmptyCellNeighbor(dest);
+
+            for (int i = 0; i < neighbor.Count; i++)
+            {
+                int[] startIndex = SearchIndexOfCell(neighbor[i]);
+                int[] targetIndex;
+                targetIndex = i + 1 > neighbor.Count - 1 ? SearchIndexOfCell(neighbor[0]) : SearchIndexOfCell(neighbor[i + 1]);
+
+                LocationPathFinding current = null;
+                var start = new LocationPathFinding { X = startIndex[0], Y = startIndex[1] };
+                var target = new LocationPathFinding { X = targetIndex[0], Y = targetIndex[1] };
+                var openList = new List<LocationPathFinding>();
+                var closedList = new List<LocationPathFinding>();
+                int g = 0;
+
+                // start by adding the original position to the open list
+                openList.Add(start);
+
+                while (openList.Count > 0)
+                {
+                    var lowest = openList.Min(l => l.F);
+                    current = openList.First(l => l.F == lowest);
+                    
+                    closedList.Add(current);
+                    openList.Remove(current);
+
+                    if (closedList.FirstOrDefault(l => l.X == target.X && l.Y == target.Y) != null)
+                        return closedList;
+
+                    var adjacentSquares = GetWalkableAdjacentSquares(current.X, current.Y);
+                    g++;
+
+                    foreach (var adjacentSquare in adjacentSquares)
+                    {
+                        // if this adjacent square is already in the closed list, ignore it
+                        if (closedList.FirstOrDefault(l => l.X == adjacentSquare.X
+                                && l.Y == adjacentSquare.Y) != null)
+                            continue;
+
+                        // if it's not in the open list...
+                        if (openList.FirstOrDefault(l => l.X == adjacentSquare.X
+                                && l.Y == adjacentSquare.Y) == null)
+                        {
+                            // compute its score, set the parent
+                            adjacentSquare.G = g;
+                            adjacentSquare.H = CalculHScore(adjacentSquare.X, adjacentSquare.Y, target.X, target.Y);
+                            adjacentSquare.F = adjacentSquare.G + adjacentSquare.H;
+                            adjacentSquare.Parent = current;
+
+                            // and add it to the open list
+                            openList.Insert(0, adjacentSquare);
+                        }
+                        else
+                        {
+                            // test if using the current G score makes the adjacent square's F score
+                            // lower, if yes update the parent because it means it's a better path
+                            if (g + adjacentSquare.H < adjacentSquare.F)
+                            {
+                                adjacentSquare.G = g;
+                                adjacentSquare.F = adjacentSquare.G + adjacentSquare.H;
+                                adjacentSquare.Parent = current;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public List<LocationPathFinding> GetWalkableAdjacentSquares(int x, int y)
+        {
+            int modifier = 0;
+
+            if (y % 2 == 0)
+            {
+                modifier = -1;
+            }
+            else
+            {
+                modifier = 1;
+            }
+
+            var proposedLocations = new List<LocationPathFinding>()
+            {
+                new LocationPathFinding { X = x - 1, Y = y },
+                new LocationPathFinding { X = x + 1, Y = y },
+                new LocationPathFinding { X = x + modifier, Y = y - 1 },
+                new LocationPathFinding { X = x, Y = y - 1 },
+                new LocationPathFinding { X = x + modifier, Y = y + 1 },
+                new LocationPathFinding { X = x, Y = y + 1 },
+            };
+
+            return proposedLocations.Where(l => Board.Board[l.X, l.Y].CellType == CellType.Water).ToList();
+        }
+
+        static int CalculHScore(int x, int y, int targetX, int targetY)
+        {
+            return Math.Abs(targetX - x) + Math.Abs(targetY - y);
         }
 
         public bool IsInAvalaibleDeplacement(List<List<Cell>> avalaibleDeplacement, ICell destination)
