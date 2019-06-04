@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Game.Penguins.Core.Interfaces.Game.GameBoard;
 using Game.Penguins.Core.Interfaces.Game.Players;
 
 namespace Game.Penguins
 {
-    class GameClass : IGame
+    public class GameClass : IGame
     {
         public GameClass()
         {
@@ -61,7 +59,7 @@ namespace Game.Penguins
             return player;
         }
 
-        PlayerColor ChoosePlayerColor()
+        public PlayerColor ChoosePlayerColor()
         {
             if (Players.Count() == 0)
             {
@@ -484,7 +482,7 @@ namespace Game.Penguins
             CurrentPlayer = Players[0];
             PenguinsByPlayer = NumberOfPenguins();
             NextAction = NextActionType.PlacePenguin;
-            StateChanged.Invoke(this, null);
+            StateChanged?.Invoke(this, null);
         }
 
         public void NextPlayer()

@@ -72,7 +72,6 @@
     <Compile Include="Commands\PlacePenguinViewModelCommand.cs" />
     <Compile Include="Commands\PlayAIViewModelCommand.cs" />
     <Compile Include="Extensions\ToPlayerTypeExtension.cs" />
-    <Compile Include="FakeGame\GameClass.cs" />
     <Compile Include="Framework\Command.cs" />
     <Compile Include="Framework\ViewModel.cs" />
     <Compile Include="Framework\ViewModelCommand.cs" />
@@ -145,8 +144,12 @@
       <Name>Game.Penguins.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Game.Penguins.Helper\Game.Penguins.Helper.csproj">
-      <Project>{4dcab8f8-e8a7-40f4-8734-3bc620ae2c13}</Project>
+      <Project>{bebb0e19-3b77-4e4f-837a-17378a9b713c}</Project>
       <Name>Game.Penguins.Helper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Game.Penguins.Service\Game.Penguins.Service.csproj">
+      <Project>{02d90792-b24a-4dfa-8bf3-57de3eab90d7}</Project>
+      <Name>Game.Penguins.Service</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
