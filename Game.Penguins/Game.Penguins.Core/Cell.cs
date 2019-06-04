@@ -31,7 +31,7 @@ namespace Game.Penguins
 
         public void ChangeState()
         {
-            StateChanged.Invoke(this, null);
+            StateChanged?.Invoke(this, null);
         }
     }
 }
