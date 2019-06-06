@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Game.Penguins.Core.Interfaces.Game.GameBoard;
+﻿using Game.Penguins.Core.Interfaces.Game.GameBoard;
 using Game.Penguins.Core.Interfaces.Game.Players;
 
 namespace Game.Penguins
 {
     public class Penguins : IPenguin
     {
-        public Penguins(IPlayer player)
+        public Penguins(PlayerClass player)
         {
-            Player = player;
+            PlayerObject = player;
         }
-        public IPlayer Player { get; set; }
+        public IPlayer Player
+        {
+            get
+            {
+                return PlayerObject;
+            }
+        }
+
+        private PlayerClass PlayerObject { get; set; }
     }
 }

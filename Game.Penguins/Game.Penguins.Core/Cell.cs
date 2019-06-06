@@ -13,7 +13,7 @@ namespace Game.Penguins
         {
             CellType = CellType.Fish;
             FishCount = fishCount;
-            CurrentPenguin = null;
+            CurrentPenguinObject = null;
         }
 
         public Cell()
@@ -25,7 +25,15 @@ namespace Game.Penguins
 
         public int FishCount { get; set; }
 
-        public IPenguin CurrentPenguin { get; set; }
+        public IPenguin CurrentPenguin
+        {
+            get
+            {
+                return CurrentPenguinObject;
+            }
+        }
+
+        public Penguins CurrentPenguinObject { get; set; }
 
         public event EventHandler StateChanged;
 

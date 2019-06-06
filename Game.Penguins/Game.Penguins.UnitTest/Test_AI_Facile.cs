@@ -15,7 +15,6 @@ namespace Game.Penguins.AI.UnitTests
             GameClass game = new GameClass();
             game.AddPlayer("player1", PlayerType.AIEasy);
             game.AddPlayer("player2", PlayerType.AIEasy);
-            game.ChoosePlayerColor();
             game.StartGame();
 
             int Initcompteur = 0;
@@ -44,7 +43,6 @@ namespace Game.Penguins.AI.UnitTests
             GameClass game = new GameClass();
             game.AddPlayer("player1", PlayerType.AIEasy);
             game.AddPlayer("player2", PlayerType.AIEasy);
-            game.ChoosePlayerColor();
             game.StartGame();
 
             List<Cell> cellList = game.IA_facile.GetAvailablePlacementCell((BoardClass)game.Board);
@@ -62,7 +60,6 @@ namespace Game.Penguins.AI.UnitTests
             GameClass game = new GameClass();
             game.AddPlayer("player1", PlayerType.AIEasy);
             game.AddPlayer("player2", PlayerType.AIEasy);
-            game.ChoosePlayerColor();
             game.StartGame();
 
             List<Cell> cellList = game.IA_facile.GetMyPenguinsCell((BoardClass)game.Board, (PlayerClass)game.CurrentPlayer);
@@ -128,7 +125,6 @@ namespace Game.Penguins.AI.UnitTests
             GameClass game = new GameClass();
             game.AddPlayer("player1", PlayerType.AIEasy);
             game.AddPlayer("player2", PlayerType.AIEasy);
-            game.ChoosePlayerColor();
             game.StartGame();
 
             Assert.IsTrue(game.IA_facile.MovePenguins((BoardClass)game.Board, (PlayerClass)game.CurrentPlayer));

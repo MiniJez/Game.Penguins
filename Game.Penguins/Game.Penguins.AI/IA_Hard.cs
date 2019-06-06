@@ -1,187 +1,162 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Game.Penguins.Core.Interfaces.Game.GameBoard;
 using Game.Penguins.Core.Interfaces.Game.Players;
 
 namespace Game.Penguins
 {
-    public class GameClass : IGame
+    class IA_Hard
     {
-        public GameClass()
+        Dictionary<string, Dictionary<string, int>> QTable = new Dictionary<string, Dictionary<string, int>>();
+        const double learningRate = 0.1; // Learning Rate
+        const double discountFactor = 0.9; // Discount Factor of Future Rewards
+        double randomize = 0.1; // Randomization Rate on Action
+        Random rnd = new Random();
+
+        BoardClass Board = new BoardClass();
+        PlayerClass CurrentPlayer;
+
+        public string GetActualState(Cell myPenguinsCell)
         {
-            Players = new List<IPlayer>();
-            Board = new BoardClass();
-            IA_facile = new IA_Facile();
+            int[] index = SearchIndexOfCell(myPenguinsCell);
+            return index[0] + ", " + index[1];
         }
 
-        public IBoard Board { get; set; }
-
-        public NextActionType NextAction { get; set; }
-
-        public IPlayer CurrentPlayer { get; set; }
-
-        public IA_Facile IA_facile { get; set; }
-
-        public IList<IPlayer> Players { get; set; }
-
-        public event EventHandler StateChanged;
-
-        public int PenguinsByPlayer { get; set; }
-
-        public int Turn { get; set; }
-
-        public int NumberOfPenguins()
+        public Dictionary<string, int> GetQTable(string stateName)
         {
-            if (Players.Count() == 2)
-            {
-                PenguinsByPlayer = 4;
-            }
-            else if (Players.Count() == 3)
-            {
-                PenguinsByPlayer = 3;
-            }
-            else if (Players.Count() == 4)
-            {
-                PenguinsByPlayer = 2;
-            }
-
-            return PenguinsByPlayer;
+            return QTable[stateName];
         }
 
-        public IPlayer AddPlayer(string playerName, PlayerType playerType)
+        public string GetBestAction(string stateName, List<List<Cell>> availableDeplacement)
         {
-            PlayerColor color = ChoosePlayerColor();
+            Dictionary<string, int> Q = GetQTable(stateName);
 
-            IPlayer player = new PlayerClass(playerType, color, playerName);
-            Players.Add(player);
+            int maxValue;
+            string choseAction;
 
-            return player;
-        }
-
-        public PlayerColor ChoosePlayerColor()
-        {
-            if (Players.Count() == 0)
+            if (rnd.NextDouble() < randomize)
             {
-                return PlayerColor.Blue;
-            }
-            else if (Players.Count() == 1)
-            {
-                return PlayerColor.Green;
-            }
-            else if (Players.Count() == 2)
-            {
-                return PlayerColor.Red;
-            }
-            else
-            {
-                return PlayerColor.Yellow;
-            }
-        }
-
-        public void Move()
-        {
-            bool endGame = false;
-
-            if (CurrentPlayer.PlayerType == PlayerType.AIEasy)
-            {
-                endGame = IA_facile.MovePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
+                int index1 = rnd.Next(availableDeplacement.Count);
+                Cell cell = availableDeplacement[index1][rnd.Next(availableDeplacement[index1].Count)];
+                int[] index = SearchIndexOfCell(cell);
+                choseAction = index[0] + ", " + index[1];
+                return choseAction;
             }
 
-            if (!endGame)
+            for (let i = 0; i < availableActions.length; i++)
             {
-                NextAction = NextActionType.MovePenguin;
-                NextPlayer();
-            } else
-            {
-                NextPlayer();
-                endGame = false;
-
-                while (!endGame) {
-                    endGame = IA_facile.MovePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
+                if (Q[availableActions[i]] > maxValue)
+                {
+                    maxValue = Q[availableActions[i]];
+                    choseAction = availableActions[i];
                 }
-
-                NextAction = NextActionType.Nothing;
             }
-            
-            StateChanged?.Invoke(this, null);
+
+            if (maxValue === 0)
+            {
+                choseAction = availableActions[getRandomInt(0, 4)];
+            }
+
+            return choseAction;
         }
 
-        public void MoveManual(ICell origin, ICell destination)
+        public void PlacePenguins(BoardClass Board, PlayerClass CurrentPlayer)
         {
-            Cell start = SearchCell(origin);
-            Cell end = SearchCell(destination);
+            List<Cell> availableCell = GetAvailablePlacementCell(Board);
+
+            int rndIndex = rnd.Next(availableCell.Count);
+
+            Cell cell = availableCell[rndIndex];
+            cell.CellType = CellType.FishWithPenguin;
+            cell.CurrentPenguinObject = new Penguins(CurrentPlayer);
+            cell.ChangeState();
+        }
+
+        public List<Cell> GetAvailablePlacementCell(BoardClass Board)
+        {
+            List<Cell> availableCell = new List<Cell>();
+
+            foreach (Cell cell in Board.Board)
+            {
+                if (cell.FishCount == 1 && cell.CellType == CellType.Fish)
+                {
+                    availableCell.Add(cell);
+                }
+            }
+
+            return availableCell;
+        }
+
+        public List<Cell> GetMyPenguinsCell(BoardClass Board, PlayerClass CurrentPlayer)
+        {
+            List<Cell> myPenguinsCell = new List<Cell>();
+
+            foreach (Cell cell in Board.Board)
+            {
+                if (cell.CurrentPenguinObject != null && cell.CurrentPenguinObject.Player == CurrentPlayer)
+                {
+                    myPenguinsCell.Add(cell);
+                }
+            }
+
+            return myPenguinsCell;
+        }
+
+        public bool MovePenguins(BoardClass board, PlayerClass currentPlayer)
+        {
+            Board = board;
+            CurrentPlayer = currentPlayer;
+            Random rnd = new Random();
+            List<Cell> myPenguinsCell = GetMyPenguinsCell(Board, CurrentPlayer);
+            int rndIndex = rnd.Next(myPenguinsCell.Count);
+            Cell start = SearchCell(myPenguinsCell[rndIndex]);
             List<List<Cell>> avalaibleDeplacement = FindAvalaibleDeplacement(start);
 
-            if (start.CurrentPenguin != null && start.CurrentPenguin.Player == CurrentPlayer && end.CellType == CellType.Fish && IsInAvalaibleDeplacement(avalaibleDeplacement, destination))
+            string actualStateName = GetActualState(myPenguinsCell[rndIndex]);
+            string action = GetBestAction(actualStateName, avalaibleDeplacement);
+
+            if (myPenguinsCell.Count != 0)
             {
-                PlayerClass currentPlayer = (PlayerClass)CurrentPlayer;
-                currentPlayer.Points += start.FishCount;
-                currentPlayer.ChangeState();
-
-                start.CellType = CellType.Water;
-                start.FishCount = 0;
-                start.CurrentPenguinObject = null;
-
-                end.CellType = CellType.FishWithPenguin;
-                end.CurrentPenguinObject = new Penguins((PlayerClass)CurrentPlayer);
-
-                NextAction = NextActionType.MovePenguin;
-                NextPlayer();
-                StateChanged(this, null);
-                start.ChangeState();
-                end.ChangeState();
-            }
-        }
-
-        public bool IsInAvalaibleDeplacement(List<List<Cell>> avalaibleDeplacement, ICell destination)
-        {
-            for (int i = 0; i < avalaibleDeplacement.Count; i++)
-            {
-                if (avalaibleDeplacement[i].Exists(e => e == destination))
+                if (avalaibleDeplacement.Count == 0)
                 {
-                    return true;
+                    Cell toDelete = myPenguinsCell[rndIndex];
+                    
+                    CurrentPlayer.Points += toDelete.FishCount;
+                    CurrentPlayer.ChangeState();
+
+                    toDelete.CellType = CellType.Water;
+                    toDelete.FishCount = 0;
+                    toDelete.CurrentPenguinObject = null;
+                    toDelete.ChangeState();
+
+                    MovePenguins(Board, CurrentPlayer);
                 }
-            }
-
-            return false;
-        }
-
-        public Cell SearchCell(ICell cellToFind)
-        {
-            for (int i = 0; i < Board.Board.GetLength(0); i++)
-            {
-                for (int j = 0; j < Board.Board.GetLength(1); j++)
+                else
                 {
-                    if (Board.Board[i, j] == cellToFind)
-                    {
-                        return (Cell)Board.Board[i, j];
-                    }
+                    Cell start = myPenguinsCell[rndIndex];
+
+                    rndIndex = rnd.Next(availableCell.Count);
+                    Cell end = availableCell[rndIndex];
+
+                    PlayerClass currentPlayer = CurrentPlayer;
+                    currentPlayer.Points += start.FishCount;
+                    currentPlayer.ChangeState();
+
+                    start.CellType = CellType.Water;
+                    start.FishCount = 0;
+                    start.CurrentPenguinObject = null;
+
+                    end.CellType = CellType.FishWithPenguin;
+                    end.CurrentPenguinObject = new Penguins(CurrentPlayer);
+
+                    start.ChangeState();
+                    end.ChangeState();
                 }
+
+                return false;
             }
 
-            return null;
-        }
-
-        public int[] SearchIndexOfCell(Cell cell)
-        {
-            int[] index = new int[2];
-
-            for (int i = 0; i < Board.Board.GetLength(0); i++)
-            {
-                for (int j = 0; j < Board.Board.GetLength(1); j++)
-                {
-                    if (Board.Board[i, j] == cell)
-                    {
-                        index[0] = i;
-                        index[1] = j;
-
-                        return index;
-                    }
-                }
-            }
-
-            return null;
+            return true;
         }
 
         public List<List<Cell>> FindAvalaibleDeplacement(Cell origin)
@@ -436,65 +411,41 @@ namespace Game.Penguins
             return deplacementLigne;
         }
 
-        public void PlacePenguin()
+        public Cell SearchCell(ICell cellToFind)
         {
-            if (CurrentPlayer.PlayerType == PlayerType.AIEasy)
+            for (int i = 0; i < Board.Board.GetLength(0); i++)
             {
-                IA_facile.PlacePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
-            }
-
-            NextAction = NextActionType.PlacePenguin;
-            if (Turn == Players.Count() * PenguinsByPlayer)
-            {
-                NextAction = NextActionType.MovePenguin;
-            }
-
-            Turn++;
-            NextPlayer();
-            StateChanged?.Invoke(this, null);
-        }
-
-        public void PlacePenguinManual(int x, int y)
-        {
-            Cell cell = (Cell)Board.Board[x, y];
-
-            if (cell.FishCount == 1 && cell.CurrentPenguin == null)
-            {
-                cell.CellType = CellType.FishWithPenguin;
-                cell.CurrentPenguinObject = new Penguins((PlayerClass)CurrentPlayer);
-
-                NextAction = NextActionType.PlacePenguin;
-                if (Turn == Players.Count() * PenguinsByPlayer)
+                for (int j = 0; j < Board.Board.GetLength(1); j++)
                 {
-                    NextAction = NextActionType.MovePenguin;
+                    if (Board.Board[i, j] == cellToFind)
+                    {
+                        return (Cell)Board.Board[i, j];
+                    }
                 }
-
-                Turn++;
-                NextPlayer();
-                cell.ChangeState();
-                StateChanged?.Invoke(this, null);
             }
+
+            return null;
         }
 
-        public void StartGame()
+        public int[] SearchIndexOfCell(Cell cell)
         {
-            Turn = 1;
-            CurrentPlayer = Players[0];
-            PenguinsByPlayer = NumberOfPenguins();
-            NextAction = NextActionType.PlacePenguin;
-            StateChanged?.Invoke(this, null);
-        }
+            int[] index = new int[2];
 
-        public void NextPlayer()
-        {
-            int nextPlayerIndex = Players.IndexOf(CurrentPlayer) + 1;
-
-            if(nextPlayerIndex == Players.Count())
+            for (int i = 0; i < Board.Board.GetLength(0); i++)
             {
-                nextPlayerIndex = 0;
+                for (int j = 0; j < Board.Board.GetLength(1); j++)
+                {
+                    if (Board.Board[i, j] == cell)
+                    {
+                        index[0] = i;
+                        index[1] = j;
+
+                        return index;
+                    }
+                }
             }
 
-            CurrentPlayer = Players[nextPlayerIndex];
+            return null;
         }
     }
 }

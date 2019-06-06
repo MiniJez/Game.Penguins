@@ -19,7 +19,7 @@ namespace Game.Penguins
 
             Cell cell = availableCell[rndIndex];
             cell.CellType = CellType.FishWithPenguin;
-            cell.CurrentPenguin = new Penguins(CurrentPlayer);
+            cell.CurrentPenguinObject = new Penguins(CurrentPlayer);
             cell.ChangeState();
         }
 
@@ -58,7 +58,7 @@ namespace Game.Penguins
 
                     toDelete.CellType = CellType.Water;
                     toDelete.FishCount = 0;
-                    toDelete.CurrentPenguin = null;
+                    toDelete.CurrentPenguinObject = null;
                     toDelete.ChangeState();
 
                     MovePenguins(Board, CurrentPlayer);
@@ -76,10 +76,10 @@ namespace Game.Penguins
 
                     start.CellType = CellType.Water;
                     start.FishCount = 0;
-                    start.CurrentPenguin = null;
+                    start.CurrentPenguinObject = null;
 
                     end.CellType = CellType.FishWithPenguin;
-                    end.CurrentPenguin = new Penguins(CurrentPlayer);
+                    end.CurrentPenguinObject = new Penguins(CurrentPlayer);
 
                     start.ChangeState();
                     end.ChangeState();
@@ -97,7 +97,7 @@ namespace Game.Penguins
 
             foreach (Cell cell in Board.Board)
             {
-                if (cell.CurrentPenguin != null && cell.CurrentPenguin.Player == CurrentPlayer)
+                if (cell.CurrentPenguinObject != null && cell.CurrentPenguinObject.Player == CurrentPlayer)
                 {
                     myPenguinsCell.Add(cell);
                 }
