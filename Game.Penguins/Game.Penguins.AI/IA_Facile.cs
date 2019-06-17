@@ -120,7 +120,7 @@ namespace Game.Penguins
             {
                 modifier = 1;
             }
-            Console.WriteLine("I : {0}, J : {1}", startCellIndex[0], startCellIndex[1]);
+            //Console.WriteLine("I : {0}, J : {1}", startCellIndex[0], startCellIndex[1]);
             if (startCellIndex[0] + modifier >= 0 && startCellIndex[0] + modifier <= 7 && startCellIndex[1] - 1 >= 0)
                 neighbor.Add((Cell)Board.Board[startCellIndex[0] + modifier, startCellIndex[1] - 1]);
             if (startCellIndex[1] - 1 >= 0)

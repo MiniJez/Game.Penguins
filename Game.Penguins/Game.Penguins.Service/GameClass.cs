@@ -63,7 +63,7 @@ namespace Game.Penguins
 			if (AIPenguins == null)
 			{
 				AIPenguins = new Dictionary<IPlayer, List<Cell>>();
-				Console.WriteLine("new AI added: {0}", player.Name);
+				//Console.WriteLine("new AI added: {0}", player.Name);
 			}
 			if (player.PlayerType != PlayerType.Human)
 			{

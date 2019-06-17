@@ -408,73 +408,68 @@ namespace Game.Penguins
 			int x = originIndex[0];
 			int y = originIndex[1];
 			bool token = false;
-			if (y % 2 == 0)
-			{
-				Console.WriteLine("line number is even ({0})", y % 2);
-			}
-			else Console.WriteLine("line number is odd ({0})", y % 2);
-			Console.Write("penguin in cell [{0},{1}] for player {2} ", x, y, currentPlayer.Name);
+			//Console.Write("penguin in cell [{0},{1}] for player {2} ", x, y, currentPlayer.Name);
 
 			if (y > 0 && !token)
 			{
-				Console.Write("type1: {0} ", Board.Board[x, y - 1].CellType);
+				//Console.Write("type1: {0} ", Board.Board[x, y - 1].CellType);
 				if (Board.Board[x, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x, y - 1].CellType != CellType.Water) token = true;
-				Console.Write(token + " ");
+				//Console.Write(token + " ");
 			}
 			if (y < 7 && !token)
 			{
-				Console.Write("type2: {0} ", Board.Board[x, y + 1].CellType);
+				//Console.Write("type2: {0} ", Board.Board[x, y + 1].CellType);
 				if (Board.Board[x, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x, y + 1].CellType != CellType.Water) token = true;
-				Console.Write(token + " ");
+				//Console.Write(token + " ");
 			}
 			if (x < 7 && !token)
 			{
-				Console.Write("type3: {0} ", Board.Board[x + 1, y].CellType);
+				//Console.Write("type3: {0} ", Board.Board[x + 1, y].CellType);
 				if (Board.Board[x + 1, y].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y].CellType != CellType.Water) token = true;
-				Console.Write(token + " ");
+				//Console.Write(token + " ");
 			}
 			if (x > 0 && !token)
 			{
-				Console.Write("type4: {0} ", Board.Board[x - 1, y].CellType);
+				//Console.Write("type4: {0} ", Board.Board[x - 1, y].CellType);
 				if (Board.Board[x - 1, y].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y].CellType != CellType.Water) token = true;
-				Console.Write(token + " ");
+				//Console.Write(token + " ");
 			}
 			if (y % 2 != 0 && !token) /// line number is odd
 			{
-				Console.Write("odd numbers: ");
+				//Console.Write("odd numbers: ");
 				if (x < 7 && y > 0)
 				{
-					Console.Write("type5: {0} ", Board.Board[x + 1, y - 1].CellType);
+					//Console.Write("type5: {0} ", Board.Board[x + 1, y - 1].CellType);
 					if (Board.Board[x + 1, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y - 1].CellType != CellType.Water) token = true;
-					Console.Write(token + " ");
+					//Console.Write(token + " ");
 				}
 				if (x < 7 && y < 7 && !token)
 				{
-					Console.Write("type6: {0} ", Board.Board[x + 1, y + 1].CellType);
+					//Console.Write("type6: {0} ", Board.Board[x + 1, y + 1].CellType);
 					if (Board.Board[x + 1, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y + 1].CellType != CellType.Water) token = true;
-					Console.Write(token + " ");
+					//Console.Write(token + " ");
 				}
 			}
 			if (y % 2 == 0 && !token) /// line number is even
 			{
-				Console.Write("even numbers: ");
+				//Console.Write("even numbers: ");
 				if (x > 0 && y > 0)
 				{
-					Console.Write("type7: {0} ", Board.Board[x - 1, y - 1].CellType);
+					//Console.Write("type7: {0} ", Board.Board[x - 1, y - 1].CellType);
 					if (Board.Board[x - 1, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y - 1].CellType != CellType.Water) token = true;
-					Console.Write(token + " ");
+					//Console.Write(token + " ");
 				}
 				if (x > 0 && y < 7 && !token)
 				{
-					Console.Write("type8: {0} ", Board.Board[x - 1, y + 1].CellType);
+					//Console.Write("type8: {0} ", Board.Board[x - 1, y + 1].CellType);
 					if (Board.Board[x - 1, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y + 1].CellType != CellType.Water) token = true;
-					Console.Write(token + " ");
+					//Console.Write(token + " ");
 				}
 
 			}
 			if (!token)
 			{
-				Console.WriteLine(" needs to be deleted");
+				//Console.WriteLine(" needs to be deleted");
 				currentPlayer.Penguins--;
 				AIPenguins[currentPlayer].Remove(origin);
 				origin.CellType = CellType.Water;
@@ -482,7 +477,7 @@ namespace Game.Penguins
 				origin.CurrentPenguin = null;
 				origin.ChangeState();
 			}
-			else Console.WriteLine(" doesn't need to be deleted");
+			//else Console.WriteLine(" doesn't need to be deleted");
 			return token;
 
 		}
