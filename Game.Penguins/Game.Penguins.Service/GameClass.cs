@@ -95,51 +95,44 @@ namespace Game.Penguins
 
 		public void Move()
 		{
-			if (CurrentPlayer.Penguins <= 0)
+
+			bool endGame = true;
+			foreach (var item in Players)
 			{
-				Console.WriteLine("next player");
+				if (item.Penguins > 0)
+				{
+					endGame = false;
+				}
+			}
+
+
+			if (CurrentPlayer.PlayerType == PlayerType.AIEasy)
+			{
+				endGame = IA_facile.MovePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
+			}
+			else if (CurrentPlayer.PlayerType == PlayerType.AIMedium)
+			{
+				AI_medium.Move(Board, CurrentPlayer, AIPenguins);
+			}
+
+			if (!endGame)
+			{
+				NextAction = NextActionType.MovePenguin;
 				NextPlayer();
 			}
 			else
 			{
+				NextPlayer();
+				endGame = false;
 
-				bool endGame = true;
-				foreach (var item in Players)
-				{
-					if (item.Penguins > 0)
-					{
-						endGame = false;
-					}
-				}
-
-
-				if (CurrentPlayer.PlayerType == PlayerType.AIEasy)
+				while (!endGame)
 				{
 					endGame = IA_facile.MovePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
 				}
-				else if (CurrentPlayer.PlayerType == PlayerType.AIMedium)
-				{
-					AI_medium.Move(Board, CurrentPlayer, AIPenguins);
-				}
 
-				if (!endGame)
-				{
-					NextAction = NextActionType.MovePenguin;
-					NextPlayer();
-				}
-				else
-				{
-					NextPlayer();
-					endGame = false;
-
-					while (!endGame)
-					{
-						endGame = IA_facile.MovePenguins((BoardClass)Board, (PlayerClass)CurrentPlayer);
-					}
-
-					NextAction = NextActionType.Nothing;
-				}
+				NextAction = NextActionType.Nothing;
 			}
+
 
 			StateChanged(this, null);
 		}
