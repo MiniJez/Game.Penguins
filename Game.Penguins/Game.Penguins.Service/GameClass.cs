@@ -73,7 +73,7 @@ namespace Game.Penguins
 			return player;
 		}
 
-		PlayerColor ChoosePlayerColor()
+		public PlayerColor ChoosePlayerColor()
 		{
 			if (Players.Count() == 0)
 			{
@@ -95,19 +95,20 @@ namespace Game.Penguins
 
 		public void Move()
 		{
-			if (CurrentPlayer.Penguins == 0)
+			if (CurrentPlayer.Penguins <= 0)
 			{
+				Console.WriteLine("next player");
 				NextPlayer();
 			}
 			else
 			{
 
-				bool endGame = false;
+				bool endGame = true;
 				foreach (var item in Players)
 				{
-					if (item.Penguins == 0)
+					if (item.Penguins > 0)
 					{
-						endGame = true;
+						endGame = false;
 					}
 				}
 

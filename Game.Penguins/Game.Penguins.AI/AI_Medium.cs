@@ -16,17 +16,6 @@ namespace Game.Penguins
 			r = new Random();
 		}
 
-		private void NextPlayer(IList<IPlayer> Players, IPlayer CurrentPlayer)
-		{
-			int nextPlayerIndex = Players.IndexOf(CurrentPlayer) + 1;
-
-			if (nextPlayerIndex == Players.Count())
-			{
-				nextPlayerIndex = 0;
-			}
-
-			CurrentPlayer = Players[nextPlayerIndex];
-		}
 		private Cell SearchCell(IBoard Board, ICell cellToFind)
 		{
 			for (int i = 0; i < Board.Board.GetLength(0); i++)
