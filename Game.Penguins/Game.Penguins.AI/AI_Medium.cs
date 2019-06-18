@@ -9,13 +9,19 @@ namespace Game.Penguins
 {
 	public class AI_Medium
 	{
-		public Random r { get; }
+		private Random r { get; }
 
 		public AI_Medium()
 		{
 			r = new Random();
 		}
 
+		/// <summary>
+		/// Search the provided cell in the board
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="cellToFind"></param>
+		/// <returns></returns>
 		private Cell SearchCell(IBoard Board, ICell cellToFind)
 		{
 			for (int i = 0; i < Board.Board.GetLength(0); i++)
@@ -31,6 +37,13 @@ namespace Game.Penguins
 
 			return null;
 		}
+		
+		/// <summary>
+		/// Check if the cell is available for move
+		/// </summary>
+		/// <param name="avalaibleDeplacement"></param>
+		/// <param name="destination"></param>
+		/// <returns></returns>
 		private bool IsInAvalaibleDeplacement(List<List<Cell>> avalaibleDeplacement, ICell destination)
 		{
 			for (int i = 0; i < avalaibleDeplacement.Count; i++)
@@ -43,21 +56,36 @@ namespace Game.Penguins
 
 			return false;
 		}
-		private List<List<Cell>> FindAvalaibleDeplacement(IBoard Board, Cell origin, Cell dest)
+		
+		/// <summary>
+		/// Find available deplacement for a cell
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="origin"></param>
+		/// <param name="dest"></param>
+		/// <returns></returns>
+		private List<List<Cell>> FindAvalaibleDeplacement(IBoard Board, Cell origin)
 		{
 			List<List<Cell>> avalaibleDeplacement = new List<List<Cell>>();
 			int[] cellIndexOrigin = SearchIndexOfCell(Board, origin);
 
-			avalaibleDeplacement.Add(FindAvalaibleLigne(Board, cellIndexOrigin));
-			avalaibleDeplacement.Add(FindAvalaibleDiagGauche(Board, cellIndexOrigin));
+			avalaibleDeplacement.Add(FindAvalaibleLine(Board, cellIndexOrigin));
+			avalaibleDeplacement.Add(FindAvalaibleDiagLeft(Board, cellIndexOrigin));
 			avalaibleDeplacement.Add(FindAvalaibleDiagDroite(Board, cellIndexOrigin));
 
-			avalaibleDeplacement = RemoveUnreachableCellInLigne(Board, avalaibleDeplacement, cellIndexOrigin);
-			avalaibleDeplacement = RemoveUnreachableCellInDiagGauche(Board, avalaibleDeplacement, cellIndexOrigin);
-			avalaibleDeplacement = RemoveUnreachableCellInDiagDroite(Board, avalaibleDeplacement, cellIndexOrigin);
+			avalaibleDeplacement = RemoveUnreachableCellInLine(Board, avalaibleDeplacement, cellIndexOrigin);
+			avalaibleDeplacement = RemoveUnreachableCellInDiagLeft(Board, avalaibleDeplacement, cellIndexOrigin);
+			avalaibleDeplacement = RemoveUnreachableCellInDiagRight(Board, avalaibleDeplacement, cellIndexOrigin);
 
 			return avalaibleDeplacement;
 		}
+		
+		/// <summary>
+		/// Search for the index of a cell in the board
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="cell"></param>
+		/// <returns></returns>
 		private int[] SearchIndexOfCell(IBoard Board, Cell cell)
 		{
 			int[] index = new int[2];
@@ -78,7 +106,15 @@ namespace Game.Penguins
 
 			return null;
 		}
-		public List<List<Cell>> RemoveUnreachableCellInLigne(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
+		
+		/// <summary>
+		/// Remove an unreachable cell in available cell list for a line
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="avalaibleDeplacement"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
+		public List<List<Cell>> RemoveUnreachableCellInLine(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
 		{
 			int[] rm = new int[2];
 			int[] rm1 = new int[2];
@@ -106,7 +142,15 @@ namespace Game.Penguins
 
 			return avalaibleDeplacement;
 		}
-		private List<List<Cell>> RemoveUnreachableCellInDiagGauche(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
+		
+		/// <summary>
+		/// Remove an unreachable cell in available cell list for the first diag
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="avalaibleDeplacement"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
+		private List<List<Cell>> RemoveUnreachableCellInDiagLeft(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
 		{
 			int[] rm = new int[2];
 			int[] rm1 = new int[2];
@@ -134,7 +178,15 @@ namespace Game.Penguins
 
 			return avalaibleDeplacement;
 		}
-		private List<List<Cell>> RemoveUnreachableCellInDiagDroite(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
+		
+		/// <summary>
+		/// Remove an unreachable cell in available cell list for the second diag
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="avalaibleDeplacement"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
+		private List<List<Cell>> RemoveUnreachableCellInDiagRight(IBoard Board, List<List<Cell>> avalaibleDeplacement, int[] cellIndexOrigin)
 		{
 			int[] rm = new int[2];
 			int[] rm1 = new int[2];
@@ -162,6 +214,13 @@ namespace Game.Penguins
 
 			return avalaibleDeplacement;
 		}
+		
+		/// <summary>
+		/// find available cell in first diag
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
 		private List<Cell> FindAvalaibleDiagDroite(IBoard Board, int[] cellIndexOrigin)
 		{
 			List<Cell> deplacementDiagDroite = new List<Cell>();
@@ -227,7 +286,14 @@ namespace Game.Penguins
 			deplacementDiagDroite = deplacementDiagDroite.OrderByDescending(e => SearchIndexOfCell(Board, e)[1]).ToList();
 			return deplacementDiagDroite;
 		}
-		private List<Cell> FindAvalaibleDiagGauche(IBoard Board, int[] cellIndexOrigin)
+		
+		/// <summary>
+		/// find available cell in second diag
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
+		private List<Cell> FindAvalaibleDiagLeft(IBoard Board, int[] cellIndexOrigin)
 		{
 			List<Cell> deplacementDiagGauche = new List<Cell>();
 
@@ -291,7 +357,14 @@ namespace Game.Penguins
 
 			return deplacementDiagGauche;
 		}
-		private List<Cell> FindAvalaibleLigne(IBoard Board, int[] cellIndexOrigin)
+		
+		/// <summary>
+		/// find available cell in line
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="cellIndexOrigin"></param>
+		/// <returns></returns>
+		private List<Cell> FindAvalaibleLine(IBoard Board, int[] cellIndexOrigin)
 		{
 			List<Cell> deplacementLigne = new List<Cell>();
 
@@ -308,6 +381,13 @@ namespace Game.Penguins
 
 			return deplacementLigne;
 		}
+		
+		/// <summary>
+		/// Move the penguin
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="CurrentPlayer"></param>
+		/// <param name="AIPenguins"></param>
 		public void Move(IBoard Board, IPlayer CurrentPlayer, Dictionary<IPlayer, List<Cell>> AIPenguins)
 		{
 			if (CurrentPlayer.Penguins > 0)
@@ -325,7 +405,7 @@ namespace Game.Penguins
 						int random = r.Next(0, CurrentPlayer.Penguins - 1);
 						start = SearchCell(Board, AIPenguins[CurrentPlayer][random]);
 						end = SearchCell(Board, Board.Board[r.Next(0, 8), r.Next(0, 8)]);
-						avalaibleDeplacement = FindAvalaibleDeplacement(Board, start, end);
+						avalaibleDeplacement = FindAvalaibleDeplacement(Board, start);
 						check = RemovePenguins(Board, start, currentPlayer, AIPenguins);
 					} while (!check);
 
@@ -355,6 +435,13 @@ namespace Game.Penguins
 				}
 			}
 		}
+		
+		/// <summary>
+		/// Place the penguin
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="CurrentPlayer"></param>
+		/// <param name="AIPenguins"></param>
 		public void PlacePenguin(IBoard Board, IPlayer CurrentPlayer, Dictionary<IPlayer, List<Cell>> AIPenguins)
 		{
 			List<Cell> AvailableCell = new List<Cell>();
@@ -391,74 +478,62 @@ namespace Game.Penguins
 
 
 		}
+		
+		/// <summary>
+		/// Check if a penguins is surrounded by water and remove it
+		/// </summary>
+		/// <param name="Board"></param>
+		/// <param name="origin"></param>
+		/// <param name="currentPlayer"></param>
+		/// <param name="AIPenguins"></param>
+		/// <returns></returns>
 		private bool RemovePenguins(IBoard Board, Cell origin, PlayerClass currentPlayer, Dictionary<IPlayer, List<Cell>> AIPenguins)
 		{
 			int[] originIndex = SearchIndexOfCell(Board, origin);
 			int x = originIndex[0];
 			int y = originIndex[1];
 			bool token = false;
-			//Console.Write("penguin in cell [{0},{1}] for player {2} ", x, y, currentPlayer.Name);
-
 			if (y > 0 && !token)
 			{
-				//Console.Write("type1: {0} ", Board.Board[x, y - 1].CellType);
 				if (Board.Board[x, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x, y - 1].CellType != CellType.Water) token = true;
-				//Console.Write(token + " ");
 			}
 			if (y < 7 && !token)
 			{
-				//Console.Write("type2: {0} ", Board.Board[x, y + 1].CellType);
 				if (Board.Board[x, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x, y + 1].CellType != CellType.Water) token = true;
-				//Console.Write(token + " ");
 			}
 			if (x < 7 && !token)
 			{
-				//Console.Write("type3: {0} ", Board.Board[x + 1, y].CellType);
 				if (Board.Board[x + 1, y].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y].CellType != CellType.Water) token = true;
-				//Console.Write(token + " ");
 			}
 			if (x > 0 && !token)
 			{
-				//Console.Write("type4: {0} ", Board.Board[x - 1, y].CellType);
 				if (Board.Board[x - 1, y].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y].CellType != CellType.Water) token = true;
-				//Console.Write(token + " ");
 			}
 			if (y % 2 != 0 && !token) /// line number is odd
 			{
-				//Console.Write("odd numbers: ");
 				if (x < 7 && y > 0)
 				{
-					//Console.Write("type5: {0} ", Board.Board[x + 1, y - 1].CellType);
 					if (Board.Board[x + 1, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y - 1].CellType != CellType.Water) token = true;
-					//Console.Write(token + " ");
 				}
 				if (x < 7 && y < 7 && !token)
 				{
-					//Console.Write("type6: {0} ", Board.Board[x + 1, y + 1].CellType);
 					if (Board.Board[x + 1, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x + 1, y + 1].CellType != CellType.Water) token = true;
-					//Console.Write(token + " ");
 				}
 			}
 			if (y % 2 == 0 && !token) /// line number is even
 			{
-				//Console.Write("even numbers: ");
 				if (x > 0 && y > 0)
 				{
-					//Console.Write("type7: {0} ", Board.Board[x - 1, y - 1].CellType);
 					if (Board.Board[x - 1, y - 1].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y - 1].CellType != CellType.Water) token = true;
-					//Console.Write(token + " ");
 				}
 				if (x > 0 && y < 7 && !token)
 				{
-					//Console.Write("type8: {0} ", Board.Board[x - 1, y + 1].CellType);
 					if (Board.Board[x - 1, y + 1].CellType != CellType.FishWithPenguin && Board.Board[x - 1, y + 1].CellType != CellType.Water) token = true;
-					//Console.Write(token + " ");
 				}
 
 			}
 			if (!token)
 			{
-				//Console.WriteLine(" needs to be deleted");
 				currentPlayer.Penguins--;
 				AIPenguins[currentPlayer].Remove(origin);
 				origin.CellType = CellType.Water;
@@ -466,7 +541,6 @@ namespace Game.Penguins
 				origin.CurrentPenguin = null;
 				origin.ChangeState();
 			}
-			//else Console.WriteLine(" doesn't need to be deleted");
 			return token;
 
 		}
